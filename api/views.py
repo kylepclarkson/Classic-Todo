@@ -1,4 +1,4 @@
-
+from django.contrib.sessions.backends.db import SessionStore
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -25,11 +25,10 @@ def api_summary(request):
 def todo_list(request):
     """ Get all todo items for this user. """
 
-    todos = Todo.objects.filter(session_key=request.session.session_key)
-    # todos = Todo.objects.filter(session_key='123')
+    todos = Todo.objects.all()
 
     serializer = TodoSerializer(todos, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data,)
 
 
 @api_view(['GET'])
@@ -37,9 +36,6 @@ def todo_detail(request, pk):
     """ Single todo item. """
  
     todo = Todo.objects.get(pk=pk)
-    
-    if todo.session_key != request.session.session_key:
-        return Response("You cannot access this item!")
 
     serializer = TodoSerializer(todo, many=False)
     return Response(serializer.data)
@@ -50,8 +46,6 @@ def todo_create(request):
     """ Create a new todo item """
     serializer = TodoSerializer(data=request.data)
     if serializer.is_valid():
-        # save item
-        serializer.validated_data['session_key'] = request.session.session_key
         serializer.save()
 
     return Response(serializer.data)
@@ -60,13 +54,9 @@ def todo_create(request):
 def todo_update(request, pk):
     """ Update existing todo item """
     todo = Todo.objects.get(pk=pk)
-
-    if todo.session_key != request.session.session_key:
-        return Response("You cannot access this item!")
     
     serializer = TodoSerializer(instance=todo, data=request.data)
     if serializer.is_valid():
-        serializer.validated_data['session_key'] = todo.session_key
         serializer.save()
 
     return Response(serializer.data)
@@ -76,9 +66,6 @@ def todo_update(request, pk):
 def todo_delete(request, pk):
     """ Delete todo item """
     todo = Todo.objects.get(pk=pk)
-
-    if todo.session_key != request.session.session_key:
-        return Response("You cannot access this item!")
     
     todo.delete()
 

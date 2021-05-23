@@ -1,0 +1,61 @@
+body {
+  font-family: 'Red Hat Display', sans-serif;
+  background: 
+    linear-gradient(90deg,
+     rgb(92, 209, 184) 0%,
+     rgb(49, 179, 150) 50%,
+     rgb(90, 203, 226) 100%);
+}
+
+.main-text-wrapper {
+  margin: auto;
+  margin-top: 40px;
+  max-width: 800px;
+  color: #609e84;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 10px 10px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+  padding: 30px;
+}
+
+#todo-container {
+  margin: 0 auto;
+  max-width: 800px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.30), 0 10px 10px rgba(0,0,0,0.22) ;
+  background-color: #fff;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-radius: 10px;
+}
+
+#form-wrapper {
+  position: -webkit-sticky;
+  position: sticky;
+  box-shadow: 0px 5px 10px rgba(0,0,0,0.25);
+  padding: 40px;
+  margin-top: 50px;
+}
+
+.flex-wrapper {
+  display: flex;
+}
+
+.list-wrapper{
+  cursor: pointer;
+  border-bottom: 1px solid  #e9e9e9;
+  color: #686868;
+  margin:5px;
+  padding:20px;
+}
+
+.list-wrapper:hover{
+  background-color: #F0F0F0;
+}
+
+#submit {
+  background-color: #357a6b;
+  border-radius: 5px;
+  border: 0;
+  color: #fff;
+  margin-left: 5px;
+}
