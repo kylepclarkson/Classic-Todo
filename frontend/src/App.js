@@ -27,7 +27,7 @@ class App extends React.Component {
   }
 
   fetchTasks() {
-    // Get tasks from api.
+    // Get tasks from api. Called when updates occur. 
     fetch("http://127.0.0.1:8000/api/list/")
       .then((res) => res.json())
       .then((data) => {
@@ -39,7 +39,6 @@ class App extends React.Component {
 
   handleChange(e) {
     // Handle typing of todo item.
-    let name = e.target.name;
     let value = e.target.value;
 
     // Update current item.
@@ -130,7 +129,7 @@ class App extends React.Component {
   }
 
   render() {
-    // define this for loop
+    // = Define self for use of 'this' in for loop. 
     const self = this;
     return (
       <div className="container">
