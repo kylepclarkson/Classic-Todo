@@ -1,6 +1,6 @@
 # Classic-Todo
 
-A classic Todo application build with a Django backend and React frontend. A weekend project to brushup on my api design skills and making api calls with Javascript. 
+A classic Todo application built with a Django backend and React frontend. A weekend project to brushup on my api design skills and making calls with Javascript. 
 
 Allows for a user to create, edit, and delete todo items - a line of text.  
 
