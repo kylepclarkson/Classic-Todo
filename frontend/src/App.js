@@ -1,104 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
+function App() {
+  // state values
+  const [todoList, setTodoList] = useState([]);
+  const [currItem, setCurrItem] = useState({
+    id: null,
+    text: "",
+    completed: false,
+  });
+  const [editing, setEditing] = useState(false);
 
-    this.state = {
-      todoList: [],
-      currItem: {
-        id: null,
-        text: "",
-        completed: false,
-      },
-      editing: false, // true if creating new todo item, false if editing existing.
-    };
+  useEffect(() => {
+    fetchTasks()
+  })
 
-    // bind functions
-    this.fetchTasks = this.fetchTasks.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.toggleComplete = this.toggleComplete.bind(this);
-  }
-
-  componentDidMount() {
-    this.fetchTasks();
-  }
-
-  fetchTasks() {
-    // Get tasks from api. Called when updates occur. 
+  // Get tasks from API. 
+  const fetchTasks = () => (
     fetch("http://127.0.0.1:8000/api/list/")
       .then((res) => res.json())
       .then((data) => {
-        this.setState({
-          todoList: data,
-        });
-      });
-  }
+        setTodoList(data)
+      }))
+  
 
-  handleChange(e) {
-    // Handle typing of todo item.
+  // Update currItem
+  const handleChange = (e) => {
     let value = e.target.value;
 
-    // Update current item.
-    this.setState({
-      currItem: {
-        ...this.state.currItem,
-        text: value,
-      },
+    setCurrItem({
+      ...currItem,
+      text: value
     });
   }
 
-  handleSubmit(e) {
-    // Create new item using api.
-    e.preventDefault();
-    console.log(this.state.currItem);
-
-    var base_url = "http://127.0.0.1:8000/api/";
-
-    if (this.state.editing == true) {
-      // update item.
-      base_url += `update/${this.state.currItem.id}/`;
-      var method = "PUT";
-      this.setState({
-        editing: false,
-      });
-    } else {
-      // create item.
-      base_url += "create/";
-      var method = "POST";
-    }
-
-    fetch(base_url, {
-      method: method,
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify(this.state.currItem),
-    }).then((res) => {
-      this.fetchTasks();
-      // clear active item
-      this.setState({
-        currItem: {
-          id: null,
-          text: "",
-          completed: false,
-        },
-      });
-    });
-  }
-
-  makeEdit(todo) {
-    // set current item to one that is being edited.
-    this.setState({
-      currItem: todo,
-      editing: true,
-    });
-  }
-
-  deleteItem(todo) {
-    // delete item
+  // delete currItem
+  const deleteItem = (todo) => {
     const url = `http://127.0.01:8000/api/delete/${todo.id}/`;
 
     fetch(url, {
@@ -107,12 +44,18 @@ class App extends React.Component {
         "Content-Type": "application/json",
       },
     }).then((res) => {
-      this.fetchTasks();
+      fetchTasks();
     });
   }
 
-  toggleComplete(todo) {
-    // Toggle completed value of todo and update on backend.
+  // set current item and editing
+  const makeEdit = (todo) => {
+    setCurrItem(todo);
+    setEditing(true);
+  }
+
+  // toggle completed value of todo, update on backend. 
+  const toggleCompleted = (todo) => {
     todo.completed = !todo.completed;
     fetch(`http://127.0.0.1:8000/api/update/${todo.id}/`, {
       method: "PUT",
@@ -124,54 +67,86 @@ class App extends React.Component {
         text: todo.text,
       }),
     }).then((res) => {
-      this.fetchTasks();
+      fetchTasks();
     });
   }
 
-  render() {
-    // = Define self for use of 'this' in for loop. 
-    const self = this;
-    return (
-      <div className="container">
+  // Interact with the API to create, edit or delete an item.
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('current item: ', currItem);
+
+    var base_url = "http://127.0.0.1:8000/api/";
+
+    if (editing == true) {
+      // update existing item.
+      base_url += `update/${currItem.id}/`;
+      var method = "PUT";
+      setEditing(false);
+    } else {
+      // create new item.
+      base_url += "create/";
+      var method = "POST";
+    }
+
+    fetch(base_url, {
+      method: method,
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(currItem),
+    }).then((res) => {
+      fetchTasks();
+      // clear currItem
+      setCurrItem({
+        id: null,
+        text: "",
+        completed: false,
+      });
+    });
+  }
+
+  return (
+    <div className="container">
       <div className="main-text-wrapper">
         <h1 className="text-center">My Todo List</h1>
       </div>
-        <div id="todo-container">
-          <div id="form-wrapper">
-            <form id="form" onSubmit={this.handleSubmit}>
-              <div className="flex-wrapper">
-                <div style={{ flex: 6 }}>
-                  <input
-                    className="form-control"
-                    id="title"
-                    type="text"
-                    name="title"
-                    placeholder="Add task ..."
-                    onChange={this.handleChange}
-                    value={this.state.currItem.text}
-                  />
-                </div>
-
-                <div style={{ flex: 1 }}>
-                  <input
-                    id="submit"
-                    className="btn btn-warning"
-                    type="submit"
-                    name="Add"
-                  />
-                </div>
+      <div id="todo-container">
+        <div id="form-wrapper">
+          <form onSubmit={handleSubmit} id="form">
+            <div className="flex-wrapper">
+              <div style={{ flex: 6 }}>
+                <input
+                  className="form-control"
+                  id="title"
+                  type="text"
+                  name="title"
+                  placeholder="Add task ..."
+                  onChange={handleChange}
+                  value={currItem.text}
+                />
               </div>
-            </form>
-          </div>
 
-          {/* List todos */}
-          <div id="list-wrapper">
-            {this.state.todoList.map((item, index) => {
-              return (
-                <div className="list-wrapper flex-wrapper" key={index}>
-                  <div
+              <div style={{ flex: 1 }}>
+                <input
+                  id="submit"
+                  className="btn btn-warning"
+                  type="submit"
+                  name="Add"
+                />
+              </div>
+            </div>
+          </form>
+        </div>
+
+        {/* List of todo items */}
+        <div id="list-wrapper">
+          {todoList.map((item, index) => {
+            return (
+              <div className="list-wrapper flex-wrapper" key={index}>
+                <div
                     style={{ flex: 8 }}
-                    onClick={() => this.toggleComplete(item)}
+                    onClick={() => toggleCompleted(item)}
                   >
                     {item.completed == true ? (
                       <strike>{item.text}</strike>
@@ -182,7 +157,7 @@ class App extends React.Component {
                   <div style={{ flex: 2 }}>
                     <button
                       className="btn btn-sm btn-outline-info"
-                      onClick={() => self.makeEdit(item)}
+                      onClick={() => makeEdit(item)}
                     >
                       Edit
                     </button>
@@ -190,19 +165,18 @@ class App extends React.Component {
                   <div style={{ flex: 2 }}>
                     <button
                       className="btn btn-sm btn-outline-danger"
-                      onClick={() => self.deleteItem(item)}
+                      onClick={() => deleteItem(item)}
                     >
                       Delete
                     </button>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+              </div>
+            )
+          })}
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default App;
