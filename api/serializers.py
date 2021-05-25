@@ -1,6 +1,5 @@
 
 
-from django.forms import CharField
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
@@ -18,23 +17,23 @@ class LoginSerializer(serializers.Serializer):
     )
 
 
-    def validate(self, data):
-        print('validate called')
-        username = data['username']
-        password = data['password']
+    # def validate(self, data):
+    #     print('validate called')
+    #     username = data['username']
+    #     password = data['password']
 
-        if username and password:
-            user = authenticate(username=username, password=password)
+    #     if username and password:
+    #         user = authenticate(username=username, password=password)
 
-            if not user:
-                raise serializers.ValidationError({
-                    'error': 'Invalid login credentials!'
-                })
-        else:
-            raise serializers.ValidationError({
-                'error': 'Must enter a username and password!'
-            })
-        return data
+    #         if not user:
+    #             raise serializers.ValidationError({
+    #                 'error': 'Invalid login credentials!'
+    #             })
+    #     else:
+    #         raise serializers.ValidationError({
+    #             'error': 'Must enter a username and password!'
+    #         })
+    #     return data
 
 
 class RegistrationSerializer(serializers.ModelSerializer):

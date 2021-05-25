@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
+
 import "./App.css";
 
 function App() {
   // state values
+  const [authToken, setAuthToken] = useState(null);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [todoList, setTodoList] = useState([]);
   const [currItem, setCurrItem] = useState({
     id: null,
@@ -12,17 +16,16 @@ function App() {
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
-    fetchTasks()
-  }, [])
+    fetchTasks();
+  }, []);
 
-  // Get tasks from API. 
-  const fetchTasks = () => (
+  // Get tasks from API.
+  const fetchTasks = () =>
     fetch("http://127.0.0.1:8000/api/list/")
       .then((res) => res.json())
       .then((data) => {
-        setTodoList(data)
-      }))
-  
+        setTodoList(data);
+      });
 
   // Update currItem
   const handleChange = (e) => {
@@ -30,9 +33,9 @@ function App() {
 
     setCurrItem({
       ...currItem,
-      text: value
+      text: value,
     });
-  }
+  };
 
   // delete currItem
   const deleteItem = (todo) => {
@@ -46,15 +49,15 @@ function App() {
     }).then((res) => {
       fetchTasks();
     });
-  }
+  };
 
   // set current item and editing
   const makeEdit = (todo) => {
     setCurrItem(todo);
     setEditing(true);
-  }
+  };
 
-  // toggle completed value of todo, update on backend. 
+  // toggle completed value of todo, update on backend.
   const toggleCompleted = (todo) => {
     todo.completed = !todo.completed;
     fetch(`http://127.0.0.1:8000/api/update/${todo.id}/`, {
@@ -69,12 +72,12 @@ function App() {
     }).then((res) => {
       fetchTasks();
     });
-  }
+  };
 
   // Interact with the API to create, edit or delete an item.
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('current item: ', currItem);
+    console.log("current item: ", currItem);
 
     var base_url = "http://127.0.0.1:8000/api/";
 
@@ -104,47 +107,101 @@ function App() {
         completed: false,
       });
     });
-  }
+  };
+
+  const login = (e) => {
+    e.preventDefault();
+    console.log("login");
+    console.log(username, password);
+    // todo Make login attempt. 
+  };
+
 
   return (
     <div className="container">
       <div className="main-text-wrapper">
-        <h1 className="text-center">My Todo List</h1>
+        <h1 className="text-center">
+          {authToken == null ? "My Todo List" : `${username}'s Todo List`}
+        </h1>
       </div>
-      <div id="todo-container">
-        <div id="form-wrapper">
-          <form onSubmit={handleSubmit} id="form">
-            <div className="flex-wrapper">
-              <div style={{ flex: 6 }}>
-                <input
-                  className="form-control"
-                  id="title"
-                  type="text"
-                  name="title"
-                  placeholder="Add task ..."
-                  onChange={handleChange}
-                  value={currItem.text}
-                />
-              </div>
-
+      {authToken == null ? (
+        <div id="todo-container">
+          {/* Buttons for login/register */}
+          <div id="form-wrapper">
+            <ul className="nav nav-tabs">
+              <li className="nav-item">
+                <button className="nav-link">Login</button>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link" href="#">
+                  Link
+                </a>
+              </li>
+            </ul>
+            <form onSubmit={login}>
+              <input
+                className="form-control mb-2"
+                id="username"
+                name="username"
+                type="text"
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Username"
+              />
+              <input
+                className="form-control mb-2"
+                id="username"
+                name="username"
+                type="password"
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+              />
               <div style={{ flex: 1 }}>
                 <input
                   id="submit"
                   className="btn btn-warning"
                   type="submit"
+                  value="Login"
                   name="Add"
                 />
               </div>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
+      ) : (
+        <div id="todo-container">
+          <div id="form-wrapper">
+            <form onSubmit={handleSubmit} id="form">
+              <div className="flex-wrapper">
+                <div style={{ flex: 6 }}>
+                  <input
+                    className="form-control"
+                    id="title"
+                    type="text"
+                    name="title"
+                    placeholder="Add task ..."
+                    onChange={handleChange}
+                    value={currItem.text}
+                  />
+                </div>
 
-        {/* List of todo items */}
-        <div id="list-wrapper">
-          {todoList.map((item, index) => {
-            return (
-              <div className="list-wrapper flex-wrapper" key={index}>
-                <div
+                <div style={{ flex: 1 }}>
+                  <input
+                    id="submit"
+                    className="btn btn-warning"
+                    type="submit"
+                    name="Add"
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+
+          {/* List of todo items */}
+          <div id="list-wrapper">
+            {todoList.map((item, index) => {
+              return (
+                <div className="list-wrapper flex-wrapper" key={index}>
+                  <div
                     style={{ flex: 8 }}
                     onClick={() => toggleCompleted(item)}
                   >
@@ -170,11 +227,12 @@ function App() {
                       Delete
                     </button>
                   </div>
-              </div>
-            )
-          })}
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
