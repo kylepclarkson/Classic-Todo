@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
 
     'api.apps.ApiConfig',
@@ -131,3 +132,10 @@ CORS_ORIGIN_WHITELIST = [
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'frontend/build/static') # static files for React app. 
 ]
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}

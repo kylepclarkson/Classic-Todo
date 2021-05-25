@@ -13,7 +13,7 @@ function App() {
 
   useEffect(() => {
     fetchTasks()
-  })
+  }, [])
 
   // Get tasks from API. 
   const fetchTasks = () => (
