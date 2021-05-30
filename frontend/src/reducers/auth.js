@@ -13,7 +13,7 @@ import {
 import { dispatch } from "react-redux";
 
 const initialState = {
-  token: null,
+  token: localStorage.getItem('token'),
   isAuthenticated: null,
 };
 
@@ -35,6 +35,7 @@ export default function (state = initialState, action) {
 
     case LOGIN_SUCCESS:
     case REGISTER_SUCCESS:
+      localStorage.setItem('token', action.payload.token)
       return {
         ...state,
         ...action.payload,
@@ -47,6 +48,7 @@ export default function (state = initialState, action) {
     case LOGIN_FAIL:
     case LOGOUT_SUCCESS:
     case REGISTER_FAIL:
+      localStorage.removeItem('')
       return {
         ...state,
         token: null,

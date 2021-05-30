@@ -10,7 +10,7 @@ class IndexAPI(views.APIView):
 
     def get(self, request, format=None):
         return Response({
-            'name': 'Kyle'
+            # TODO set endpoints.
         })
 
 class RegisterUserAPI(generics.GenericAPIView):
