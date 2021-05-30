@@ -1,82 +1,58 @@
-
-
+from tkinter.ttk import Style
 from rest_framework import serializers
+
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 
 from .models import Todo
 
-class LoginSerializer(serializers.Serializer):
-
-    username = serializers.CharField()
-    password = serializers.CharField(
-        style = {
-            'input_type': 'password',
-        },
-        write_only=True,
-    )
-
-
-    # def validate(self, data):
-    #     print('validate called')
-    #     username = data['username']
-    #     password = data['password']
-
-    #     if username and password:
-    #         user = authenticate(username=username, password=password)
-
-    #         if not user:
-    #             raise serializers.ValidationError({
-    #                 'error': 'Invalid login credentials!'
-    #             })
-    #     else:
-    #         raise serializers.ValidationError({
-    #             'error': 'Must enter a username and password!'
-    #         })
-    #     return data
-
-
-class RegistrationSerializer(serializers.ModelSerializer):
-
-    # username = serializers.CharField()    
-    password2 = serializers.CharField(
-        style = {
-            'input_type': 'password',
-        },
-        write_only=True,
-    )
-
+# === User serializers
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'password', 'password2']
-        # Hide password field. 
+        fields = ['id', 'username']
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        style={'input_type': 'password'}
+    )
+    
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'password']
+        # exclude password from being read/displayed by serializer
         extra_kwargs = {
-            'password': {'write_only': True}
+            'password': { 
+                'write_only': True
+            }
         }
 
-    # override save 
-    def save(self):
-        # check that passwords match.
-        password = self.validated_data['password']
-        password2 = self.validated_data['password2']
-
-        if password != password2:
-            raise serializers.ValidationError({
-                'password': ['Passwords must match!']
-            })
-
-        # create user
-        user = User(
-            username=self.validated_data['username'],
-            password=self.validated_data['password']
+    # override.
+    def create(self, validated_data):
+        """ Register new user """
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            password=validated_data['password']
         )
-        user.save()
         return user
 
-class TodoSerializer(serializers.ModelSerializer):
 
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(style={'input_type': 'password'})
+
+    # override. 
+    def validate(self, attrs):
+        """ Login in user """
+        user = authenticate(**attrs)
+        if user and user.is_active:
+            return user
+        raise serializers.ValidationError("Invalid login credentials")
+
+
+# === Todo serializers
+class TodoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Todo
-
-        fields = ['id', 'text', 'completed']
-
+        fields = '__all__'

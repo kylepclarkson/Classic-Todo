@@ -1,126 +1,77 @@
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework import viewsets, permissions, generics, views
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.authtoken.models import Token
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
+from knox.models import AuthToken
 
+from . import serializers
 
-from .serializers import TodoSerializer, RegistrationSerializer, LoginSerializer
-from .models import Todo
+class IndexAPI(views.APIView):
+    
+    permissions = [permissions.AllowAny]
 
-from api import serializers
+    def get(self, request, format=None):
+        return Response({
+            'name': 'Kyle'
+        })
 
+class RegisterUserAPI(generics.GenericAPIView):
+    """ Register new user """
+    serializer_class = serializers.RegisterSerializer
 
-
-@api_view(['GET'])
-def api_summary(request):
-    """ The available endpoints of the api. """
-
-    api_endpoints = {
-        'List': '/list/',
-        'Detail': '/detail/<str:pk>',
-        'Create': '/create/',
-        'Delete': '/delete/<str:pk>/',
-        'Update': '/update/<str:pk>/',
-        'Register': '/register/',
-        'Login': '/login/'
-    }
-
-    return Response(api_endpoints)
-
-@api_view(['POST'])
-def register_user(request):
-    """ Register new user. """
-    serializer = RegistrationSerializer(data=request.data)
-    data = {}
-    if serializer.is_valid():
+    def post(self, request, *args, **kwargs):
+        # register new user and generate a token for them.
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        print(type(user))
-        data['response'] = "Successfully created new user"
-        # create token, assign to user.
-        token = Token.objects.create(user=user)
-        data['token'] = token.key
-    else:
-        data = serializer.errors
-
-    return Response(data)
+        return Response({
+            'user': serializers.UserSerializer(user, context=self.get_serializer_context()).data,
+            'token': AuthToken.objects.create(user)[1]
+        })
 
 
-@api_view(['POST'])
-def login_user(request):
-    """ Login existing user. """
-    print("view called")
-    serializer = LoginSerializer(data=request.data)
-
-    data = {}
-    if serializer.is_valid():
-        username = serializer.validated_data['username']
-        password = serializer.validated_data['password']
-        user = authenticate(username=username, password=password)
-        if user:
-            token, _ = Token.objects.get_or_create(user=user)
-            data['token'] = token.key
-        else:
-            data['error'] = ['Invalid login credentials!']
-    else:
-        data['error'] = [serializer.errors]
-    return Response(data=data)
-
-
-
-
-@api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-def todo_list(request):
-    """ Get all todo items for this user. """
-
-    todos = Todo.objects.all()
-
-    serializer = TodoSerializer(todos, many=True)
-    return Response(serializer.data,)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def todo_detail(request, pk):
-    """ Single todo item. """
- 
-    todo = Todo.objects.get(pk=pk)
-
-    serializer = TodoSerializer(todo, many=False)
-    return Response(serializer.data)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def todo_create(request):
-    """ Create a new todo item """
-    serializer = TodoSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-
-    return Response(serializer.data)
-
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def todo_update(request, pk):
-    """ Update existing todo item """
-    todo = Todo.objects.get(pk=pk)
+class LoginUserAPI(generics.GenericAPIView):
+    """ Login user """
+    serializer_class = serializers.LoginSerializer
     
-    serializer = TodoSerializer(instance=todo, data=request.data)
-    if serializer.is_valid():
-        serializer.save()
+    def post(self, request, *args, **kwargs):
+        # Login user, creating token. 
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data
+        return Response({
+            "user": serializers.UserSerializer(user, context=self.get_serializer_context()).data,
+            "token": AuthToken.objects.create(user)[1]
+        })
 
-    return Response(serializer.data)
+
+class RetrieveUserAPI(generics.RetrieveAPIView):
+    """ Get user instace """
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+    serializer_class = serializers.UserSerializer
+
+    # override
+    def get_object(self):
+        return self.request.user
 
 
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
-def todo_delete(request, pk):
-    """ Delete todo item """
-    todo = Todo.objects.get(pk=pk)
+class TodoViewSet(viewsets.ModelViewSet):
+    """ Handles creating and retrieving all todo items for a single user. """
+
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    serializer_class = serializers.TodoSerializer
+
+    # override.
+    def get_queryset(self):
+        """ Get todo items for this user """
+        return self.request.user.todos.all()
     
-    todo.delete()
+    # override.
+    def preform_create(self, serializer):
+        """ When creating todo item, set user. """
+        serializer.save(user=self.request.user)
 
-    return Response('Item deleted.')
+
