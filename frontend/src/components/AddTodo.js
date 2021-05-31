@@ -12,6 +12,7 @@ export class AddTodo extends Component {
     // PROP TYPES
     static propTypes = {
         addTodo: PropTypes.func.isRequired,
+        auth: PropTypes.object.isRequired
     }
 
     // set text. 
@@ -26,6 +27,7 @@ export class AddTodo extends Component {
         e.preventDefault();
         const { text } = this.state;
         const todo = {
+            user: this.props.auth.user.id,
             text,
             completed: false
         }
@@ -66,4 +68,8 @@ export class AddTodo extends Component {
   }
 }
 
-export default connect(null, { addTodo })(AddTodo);
+const mapStateToProps = state => ({
+  auth: state.auth,
+})
+
+export default connect(mapStateToProps, { addTodo })(AddTodo);

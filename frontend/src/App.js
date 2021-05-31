@@ -24,7 +24,7 @@ const alertOptions = {
 function App() {
   useEffect(() => {
     // Get user's token.
-    // store.dispatch(loadUser());
+    store.dispatch(loadUser());
   });
 
   return (

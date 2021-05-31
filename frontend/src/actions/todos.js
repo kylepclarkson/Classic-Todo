@@ -10,14 +10,12 @@ export const getTodos = () => (dispatch, getState) => {
   axios
     .get("http://localhost:8000/api/todos/", addTokenConfig(getState))
     .then((res) => {
-      console.log("todos: ", res.data);
       dispatch({
         type: GET_TODOS,
         payload: res.data,
       });
     })
     .catch((err) => {
-      console.log("error getting todos", err);
       dispatch(returnErrors(err.response.data, err.response.status))
     });
 };
@@ -27,7 +25,6 @@ export const deleteTodo = (id) => (dispatch, getState) => {
   axios
     .delete(`http://localhost:8000/api/todos/${id}/`, addTokenConfig(getState))
     .then((res) => {
-      // TODO
       dispatch(createMessage({ deleteTodo: 'Item deleted'}))
       dispatch({
         type: DELETE_TODO,
@@ -39,10 +36,11 @@ export const deleteTodo = (id) => (dispatch, getState) => {
 
 // ADD TODO
 export const addTodo = (todo) => (dispatch, getState) => {
+  console.log('adding todo: ', todo)
   axios
     .post("http://localhost:8000/api/todos/", todo, addTokenConfig(getState))
     .then((res) => {
-      // TODO
+      console.log('add resp:', res)
       dispatch(createMessage({ addTodo: "Todo added" }));
       dispatch({
         type: ADD_TODO,

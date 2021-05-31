@@ -14,7 +14,8 @@ export class Alerts extends Component {
 
   componentDidUpdate(prevProps) {
     const { error, alert, message } = this.props;
-    console.log('Alert did update')
+    console.log('Alert did update.')
+    console.log('message', message)
     // check if new error is present
     if (error !== prevProps.error) {
       if (error.msg.name) {
@@ -35,11 +36,11 @@ export class Alerts extends Component {
     }
     // Check if new message is present
     if (message !== prevProps.message) {
-      if (message.deleteLead) {
-        alert.success(message.deleteLead);
+      if (message.deleteTodo) {
+        alert.success(message.deleteTodo);
       }
-      if (message.addLead) {
-        alert.success(message.addLead);
+      if (message.addTodo) {
+        alert.success(message.addTodo);
       }
       if (message.passwordsNotMatch) {
         alert.error(message.passwordsNotMatch);
