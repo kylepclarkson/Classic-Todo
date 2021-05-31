@@ -1,22 +1,64 @@
 import React, { Component } from "react";
+import { connect } from "react-redux"
+import PropTypes from 'prop-types'
+import { addTodo } from '../actions/todos'
 
 export class AddTodo extends Component {
+    // STATE
+    state = {
+        text: ""
+    }
+
+    // PROP TYPES
+    static propTypes = {
+        addTodo: PropTypes.func.isRequired,
+    }
+
+    // set text. 
+    onChange = e => {
+        this.setState({
+            [e.target.name]: e.target.value
+        })
+    }
+
+    // create new todo
+    onSubmit = e => {
+        e.preventDefault();
+        const { text } = this.state;
+        const todo = {
+            text,
+            completed: false
+        }
+        this.props.addTodo(todo)
+        this.setState({
+            text: ""
+        })
+    }
+
   render() {
     return (
       <div id="form-wrapper">
         <form>
           <div className="flex-wrapper">
-            <div style={{flex: 6}}>
-              <input 
-                type="text" 
-                className="form-change"
-                id="text"
+            <div style={{ flex: 8 }}>
+              <input
+                type="text"
                 name="text"
-                placeholder="Today I must ..." />
+                className="form-control"
+                value={this.state.text}
+                onChange={this.onChange}
+                placeholder="Today I must ..."
+              />
             </div>
-          </div>
-          <div style={{flex:1}}>
-            <input type="submit" id="submit" className="btn btn-success" name="Create"/>
+            <div style={{ flex: 1 }}>
+              <input
+                type="submit"
+                id="submit"
+                className="btn btn-success"
+                name="submit"
+                onClick={this.onSubmit}
+              />
+            </div>
           </div>
         </form>
       </div>
@@ -24,4 +66,4 @@ export class AddTodo extends Component {
   }
 }
 
-export default AddTodo;
+export default connect(null, { addTodo })(AddTodo);

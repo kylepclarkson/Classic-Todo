@@ -23,14 +23,14 @@ export class TodoList extends Component {
     return (
         <div id="todo-container">
           <AddTodo />
-          <div class="">
+          <div className="main-text-wrapper">
             {this.props.todos.map((todo) => (
               <div key={todo.id} className="list-wrapper flex-wrapper">
                 <div
                   style={{ flex: 7 }}
                   onClick={this.props.toggleTodo.bind(this, todo)}
                 >
-                  {todo.completed ? (
+                  {!todo.completed ? (
                     <span>{todo.text}</span>
                   ) : (
                     <strike>{todo.text}</strike>
