@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // TODO messages
-import { GET_TODOS, DELETE_TODO, ADD_TODO } from "./types";
+import { GET_TODOS, DELETE_TODO, ADD_TODO, TOGGLE_TODO } from "./types";
 
 import { addTokenConfig } from "./auth";
 
@@ -55,6 +55,7 @@ export const addTodo = (todo) => (dispatch, getState) => {
 
 // TOGGLE TODO
 export const toggleTodo = (todo) => (dispatch, getState) => {
+  console.log('Todo before call', todo)
   const body = JSON.stringify({
     ...todo,
     completed: !todo.completed,
@@ -67,8 +68,9 @@ export const toggleTodo = (todo) => (dispatch, getState) => {
     )
     .then((res) => {
       dispatch({
-        type: GET_TODOS,
+        type: TOGGLE_TODO,
         payload: res.data,
       });
-    });
+    })
+    .catch(err => console.log('toggle: ', err));
 };

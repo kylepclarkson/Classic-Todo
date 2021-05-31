@@ -1,4 +1,4 @@
-import { DELETE_TODO, GET_TODOS, ADD_TODO } from "../actions/types";
+import { DELETE_TODO, GET_TODOS, ADD_TODO, TOGGLE_TODO } from "../actions/types";
 
 const initialState = {
   todos: [],
@@ -6,6 +6,13 @@ const initialState = {
 
 export default function (state = initialState, action) {
   switch (action.type) {
+    case TOGGLE_TODO:
+      return {
+        ...state,
+        // toggle the update todo's completed. 
+        todos: state.todos.map(todo => todo.id===action.payload.id ? {...todo, completed: action.payload.completed} : todo)
+      };
+
     case GET_TODOS:
       return {
         ...state,

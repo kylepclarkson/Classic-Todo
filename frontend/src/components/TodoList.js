@@ -21,36 +21,31 @@ export class TodoList extends Component {
 
   render() {
     return (
-      <div className="container mx-auto">
-        <AddTodo />
-        <div className="todo-container">
-          <div id="list-wrapper">
+        <div id="todo-container">
+          <AddTodo />
+          <div class="">
             {this.props.todos.map((todo) => (
-              <div key={todo.id} className="task-wrapper flex-wrapper">
-                <div 
-                    style={{ flex: 7 }}
-                    onClick={() => this.props.toggleTodo.bind(this, todo)} >
+              <div key={todo.id} className="list-wrapper flex-wrapper">
+                <div
+                  style={{ flex: 7 }}
+                  onClick={this.props.toggleTodo.bind(this, todo)}
+                >
                   {todo.completed ? (
                     <span>{todo.text}</span>
                   ) : (
                     <strike>{todo.text}</strike>
                   )}
                 </div>
-                <div style={{ flex: 1 }}>
-                  <button className="btn btn-sm btn-outline-info">Edit</button>
-                </div>
-                <div 
-                    style={{ flex: 1 }}
-                    onClick={this.props.deleteTodo.bind(this, todo.id)} >
-                  <button className="btn btn-sm btn-outline-dark">
-                    Delete
-                  </button>
+                <div
+                  style={{ flex: 1 }}
+                  onClick={this.props.deleteTodo.bind(this, todo.id)}
+                >
+                  <button className="btn btn-sm btn-danger ">Delete</button>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
     );
   }
 }
@@ -59,4 +54,6 @@ const mapStateToProps = (state) => ({
   todos: state.todos.todos,
 });
 
-export default connect(mapStateToProps, { getTodos, deleteTodo, toggleTodo })(TodoList);
+export default connect(mapStateToProps, { getTodos, deleteTodo, toggleTodo })(
+  TodoList
+);
