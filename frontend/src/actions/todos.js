@@ -1,6 +1,6 @@
 import axios from "axios";
 
-// TODO messages
+import { createMessage, returnErrors } from './messages'
 import { GET_TODOS, DELETE_TODO, ADD_TODO, TOGGLE_TODO } from "./types";
 
 import { addTokenConfig } from "./auth";
@@ -18,18 +18,17 @@ export const getTodos = () => (dispatch, getState) => {
     })
     .catch((err) => {
       console.log("error getting todos", err);
-      // TODO
-      // dispatch(returnErrors(err.response.data, err.response.status))
+      dispatch(returnErrors(err.response.data, err.response.status))
     });
 };
 
 // DELETE TODO
 export const deleteTodo = (id) => (dispatch, getState) => {
   axios
-    .delete(`http://localhost:8000/api/todos/${id}`, addTokenConfig(getState))
+    .delete(`http://localhost:8000/api/todos/${id}/`, addTokenConfig(getState))
     .then((res) => {
       // TODO
-      // dispatch(createMessage({ deleteTodo: 'Item deleted'}))
+      dispatch(createMessage({ deleteTodo: 'Item deleted'}))
       dispatch({
         type: DELETE_TODO,
         payload: id,
@@ -44,18 +43,20 @@ export const addTodo = (todo) => (dispatch, getState) => {
     .post("http://localhost:8000/api/todos/", todo, addTokenConfig(getState))
     .then((res) => {
       // TODO
-      // dispatch(createMessage({ addTodo: 'Todo added'}))
+      dispatch(createMessage({ addTodo: "Todo added" }));
       dispatch({
         type: ADD_TODO,
         payload: res.data,
       });
-    });
-  // .catch(err => dispatch(returnErrors(err.response.data, err.response.status)))
+    })
+    .catch((err) =>
+      dispatch(returnErrors(err.response.data, err.response.status))
+    );
 };
 
 // TOGGLE TODO
 export const toggleTodo = (todo) => (dispatch, getState) => {
-  console.log('Todo before call', todo)
+  console.log("Todo before call", todo);
   const body = JSON.stringify({
     ...todo,
     completed: !todo.completed,
@@ -72,5 +73,5 @@ export const toggleTodo = (todo) => (dispatch, getState) => {
         payload: res.data,
       });
     })
-    .catch(err => console.log('toggle: ', err));
+    .catch((err) => console.log("toggle: ", err));
 };

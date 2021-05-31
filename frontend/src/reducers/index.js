@@ -1,8 +1,9 @@
 import { combineReducers } from 'redux'
 
 import auth from './auth'
-import todos from './todos'
+import errors from './errors'
 import messages from './messages'
+import todos from './todos'
 
 /**
  *  Combine all reducers into a single, root reducer. 
@@ -10,6 +11,7 @@ import messages from './messages'
 
 export default combineReducers({
     auth,
-    todos,
+    errors,
     messages,
+    todos,
 })

@@ -24,7 +24,7 @@ const alertOptions = {
 function App() {
   useEffect(() => {
     // Get user's token.
-    store.dispatch(loadUser());
+    // store.dispatch(loadUser());
   });
 
   return (
@@ -33,6 +33,7 @@ function App() {
         <Router>
           <Fragment>
             <Header />
+            <Alerts />
             <div className="container">
               <Switch>
                 <PrivateRoute exact path="/" component={TodoList} />

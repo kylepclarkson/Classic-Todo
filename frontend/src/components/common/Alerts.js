@@ -14,6 +14,7 @@ export class Alerts extends Component {
 
   componentDidUpdate(prevProps) {
     const { error, alert, message } = this.props;
+    console.log('Alert did update')
     // check if new error is present
     if (error !== prevProps.error) {
       if (error.msg.name) {
