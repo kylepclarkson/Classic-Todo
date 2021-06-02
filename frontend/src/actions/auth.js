@@ -9,6 +9,7 @@ import {
   LOGOUT_SUCCESS,
   REGISTER_SUCCESS,
   REGISTER_FAIL,
+  CLEAR_TODOS,
 } from "./types";
 
 import { returnErrors } from "./messages";
@@ -71,6 +72,9 @@ export const logout = () => (dispatch, getState) => {
   axios
     .post("http://127.0.0.1:8000/api/auth/logout", null, addTokenConfig(getState))
     .then((res) => {
+      dispatch({
+        type: CLEAR_TODOS,
+      });
       dispatch({
         type: LOGOUT_SUCCESS,
       });

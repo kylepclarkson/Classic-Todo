@@ -1,4 +1,10 @@
-import { DELETE_TODO, GET_TODOS, ADD_TODO, TOGGLE_TODO } from "../actions/types";
+import {
+  DELETE_TODO,
+  GET_TODOS,
+  ADD_TODO,
+  TOGGLE_TODO,
+  CLEAR_TODOS,
+} from "../actions/types";
 
 const initialState = {
   todos: [],
@@ -9,8 +15,12 @@ export default function (state = initialState, action) {
     case TOGGLE_TODO:
       return {
         ...state,
-        // toggle the update todo's completed. 
-        todos: state.todos.map(todo => todo.id===action.payload.id ? {...todo, completed: action.payload.completed} : todo)
+        // toggle the update todo's completed.
+        todos: state.todos.map((todo) =>
+          todo.id === action.payload.id
+            ? { ...todo, completed: action.payload.completed }
+            : todo
+        ),
       };
 
     case GET_TODOS:
@@ -31,6 +41,13 @@ export default function (state = initialState, action) {
         ...state,
         // Add new todo to list.
         todos: [...state.todos, action.payload],
+      };
+
+    case CLEAR_TODOS:
+      return {
+        ...state,
+        // Clear existing todos
+        todos: [],
       };
 
     default:
