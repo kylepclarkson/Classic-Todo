@@ -14,6 +14,8 @@ And I finally dove into using Redux with React to manage my app's state. There w
 ### Registration
 ![Registration](./registration.gif)
 
+
+# Classic-Todo (Original)
 A classic Todo application built with a Django backend and React frontend. A weekend project to brush up on my api design skills and making calls with Javascript. 
 
 Allows for a user to create, edit, and delete todo items - a line of text.  
